@@ -4,10 +4,7 @@ from pyhanlp import *
 import json
 from tqdm import *
 
-train_data_path = '../data/train_data.json'
-train_data_hanlp_path = '../data/train_data_hanlp.json'
-dev_data_path = '../data/dev_data.json'
-dev_data_hanlp_path = '../data/dev_data_hanlp.json'
+
 
 return_list = []
 
@@ -37,12 +34,19 @@ def word_segmentation(input_file, output_file):
             return_list.append(return_dic)
         json.dump(return_list, open(output_file, mode='a', encoding='utf-8'), ensure_ascii=False, indent=4)
 
-# s = ['a', 'ad', 'Ag', 'al', 'an', 'b', 'begin', 'Bg', 'bl', 'c', 'cc', 'd', 'Dg', 'dl', 'e', 'end', 'f', 'g', 'gb', 'gbc', 'gc', 'gg', 'gi', 'gm', 'gp', 'h', 'i', 'j', 'k', 'l', 'm', 'mg', 'Mg', 'mq', 'n', 'nb', 'nba', 'nbc', 'nbp', 'nf', 'Ng', 'nh', 'nhd', 'nhm', 'ni', 'nic', 'nis', 'nit', 'nl', 'nm', 'nmc', 'nn', 'nnd', 'nnt', 'nr', 'nr1', 'nr2', 'nrf', 'nrj', 'ns', 'nsf', 'nt', 'ntc', 'ntcb', 'ntcf', 'ntch', 'nth', 'nto', 'nts', 'ntu', 'nx', 'nz', 'o', 'p', 'pba', 'pbei', 'q', 'qg', 'qt', 'qv', 'r', 'rg', 'Rg', 'rr', 'ry', 'rys', 'ryt', 'ryv', 'rz', 'rzs', 'rzt', 'rzv', 's', 't', 'Tg', 'u', 'ud', 'ude1', 'ude2', 'ude3', 'udeng', 'udh', 'ug', 'uguo', 'uj', 'ul', 'ule', 'ulian', 'uls', 'usuo', 'uv', 'uyy', 'uz', 'uzhe', 'uzhi', 'v', 'vd', 'vf', 'Vg', 'vi', 'vl', 'vn', 'vshi', 'vx', 'vyou', 'w', 'wb', 'wd', 'wf', 'wh', 'wj', 'wky', 'wkz', 'wm', 'wn', 'wp', 'ws', 'wt', 'ww', 'wyy', 'wyz', 'x', 'xu', 'xx', 'y', 'yg', 'z', 'zg']
-#
-# for pos in s:
-#     with open('../dict/postag_dict', mode='a', encoding='utf-8') as fw:
-#         fw.write('B-' + pos + '\n' + 'I-' + pos + '\n' + 'E-' + pos + '\n')
+def postag_dict(postag_dict_file):
+    s = ['a', 'ad', 'Ag', 'al', 'an', 'b', 'begin', 'Bg', 'bl', 'c', 'cc', 'd', 'Dg', 'dl', 'e', 'end', 'f', 'g', 'gb', 'gbc', 'gc', 'gg', 'gi', 'gm', 'gp', 'h', 'i', 'j', 'k', 'l', 'm', 'mg', 'Mg', 'mq', 'n', 'nb', 'nba', 'nbc', 'nbp', 'nf', 'Ng', 'nh', 'nhd', 'nhm', 'ni', 'nic', 'nis', 'nit', 'nl', 'nm', 'nmc', 'nn', 'nnd', 'nnt', 'nr', 'nr1', 'nr2', 'nrf', 'nrj', 'ns', 'nsf', 'nt', 'ntc', 'ntcb', 'ntcf', 'ntch', 'nth', 'nto', 'nts', 'ntu', 'nx', 'nz', 'o', 'p', 'pba', 'pbei', 'q', 'qg', 'qt', 'qv', 'r', 'rg', 'Rg', 'rr', 'ry', 'rys', 'ryt', 'ryv', 'rz', 'rzs', 'rzt', 'rzv', 's', 't', 'Tg', 'u', 'ud', 'ude1', 'ude2', 'ude3', 'udeng', 'udh', 'ug', 'uguo', 'uj', 'ul', 'ule', 'ulian', 'uls', 'usuo', 'uv', 'uyy', 'uz', 'uzhe', 'uzhi', 'v', 'vd', 'vf', 'Vg', 'vi', 'vl', 'vn', 'vshi', 'vx', 'vyou', 'w', 'wb', 'wd', 'wf', 'wh', 'wj', 'wky', 'wkz', 'wm', 'wn', 'wp', 'ws', 'wt', 'ww', 'wyy', 'wyz', 'x', 'xu', 'xx', 'y', 'yg', 'z', 'zg']
+    for pos in s:
+        with open(postag_dict_file, mode='a', encoding='utf-8') as fw:
+            fw.write('B-' + pos + '\n' + 'I-' + pos + '\n' + 'E-' + pos + '\n')
 
 if __name__ == '__main__':
+    train_data_path = '../data/train_data.json'
+    train_data_hanlp_path = '../data/train_data_hanlp.json'
+    dev_data_path = '../data/dev_data.json'
+    dev_data_hanlp_path = '../data/dev_data_hanlp.json'
+    postag_dict_file = '../dict/postag_dict'
+
     word_segmentation(train_data_path, train_data_hanlp_path)
     word_segmentation(dev_data_path, dev_data_hanlp_path)
+    # postag_dict(postag_dict_file)
