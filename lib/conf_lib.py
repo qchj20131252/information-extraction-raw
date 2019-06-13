@@ -53,7 +53,7 @@ def load_conf(conf_filename):
                     "p_model_save_dir"],
                 'spo_model_dir': ['spo_test_data_path', 'spo_train_data_path', 
                     'spo_model_save_dir'],
-                'dict_path': ["so_label_dict_path", "label_dict_path",
+                'dict_path': ["so_label_dict_path", "label_dict_path", "charemb_dict_path",
                     "postag_dict_path", "word_idx_path"]
                 }
 
