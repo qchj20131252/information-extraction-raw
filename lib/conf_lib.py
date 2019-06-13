@@ -22,7 +22,7 @@ import json
 import os
 import sys
 import argparse
-import ConfigParser
+import configparser
 
 
 def load_conf(conf_filename):
@@ -32,7 +32,7 @@ def load_conf(conf_filename):
     :rtype dict param_conf_dict: conf_dict
     """
     param_conf_dict={}
-    cf = ConfigParser.ConfigParser()
+    cf = configparser.ConfigParser()
     cf.read(conf_filename)
     int_conf_keys = {
                 'model_params': ["cost_threshold", "mark_dict_len", "word_dim",
@@ -53,7 +53,7 @@ def load_conf(conf_filename):
                     "p_model_save_dir"],
                 'spo_model_dir': ['spo_test_data_path', 'spo_train_data_path', 
                     'spo_model_save_dir'],
-                'dict_path': ["so_label_dict_path", "label_dict_path", "charemb_dict_path",
+                'dict_path': ["so_label_dict_path", "label_dict_path", "char_idx_path",
                     "postag_dict_path", "word_idx_path"]
                 }
 

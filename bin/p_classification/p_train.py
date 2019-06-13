@@ -23,7 +23,7 @@ import os
 import sys
 import time
 import argparse
-import ConfigParser
+import configparser
 
 import paddle
 import paddle.fluid as fluid
@@ -42,6 +42,7 @@ def train(conf_dict, data_reader, use_cuda=False):
     """
     label_dict_len = data_reader.get_dict_size('label_dict')
     # input layer
+    char = fluid.layers.data(name='char_data', shape=[1], dtype='int64', lod_level=1)
     word = fluid.layers.data(
         name='word_data', shape=[1], dtype='int64', lod_level=1)
     postag = fluid.layers.data(
@@ -50,14 +51,12 @@ def train(conf_dict, data_reader, use_cuda=False):
     target = fluid.layers.data(
         name='target', shape=[label_dict_len], dtype='float32', lod_level=0)
     # NN: embedding + lstm + pooling
-    feature_out = p_model.db_lstm(data_reader, word, postag, conf_dict)
+    feature_out = p_model.db_lstm(data_reader, char, word, postag, conf_dict)
     # loss function for multi-label classification
-    class_cost = fluid.layers.sigmoid_cross_entropy_with_logits(x=feature_out, \
-        label=target)
+    class_cost = fluid.layers.sigmoid_cross_entropy_with_logits(x=feature_out, label=target)
     avg_cost = fluid.layers.mean(class_cost)
     # optimization method
-    sgd_optimizer = fluid.optimizer.AdamOptimizer(
-        learning_rate=2e-3, )
+    sgd_optimizer = fluid.optimizer.AdamOptimizer(learning_rate=2e-3)
 
     sgd_optimizer.minimize(avg_cost)
 
@@ -66,7 +65,7 @@ def train(conf_dict, data_reader, use_cuda=False):
         batch_size=conf_dict['batch_size'])
 
     place = fluid.CUDAPlace(0) if use_cuda else fluid.CPUPlace()
-    feeder = fluid.DataFeeder(feed_list=[word, postag, target], place=place)
+    feeder = fluid.DataFeeder(feed_list=[char, word, postag, target], place=place)
     exe = fluid.Executor(place)
 
     save_dirname = conf_dict['p_model_save_dir']
@@ -86,16 +85,15 @@ def train(conf_dict, data_reader, use_cuda=False):
                 cost_sum += cost
                 cost_counter += 1
                 if batch_id % 10 == 0 and batch_id != 0:
-                    print >> sys.stderr, "batch %d finished, second per batch: %02f" % (
-                        batch_id, (time.time() - start_time) / batch_id)
+                    print("batch %d finished, second per batch: %02f" % (batch_id, (time.time() - start_time) / batch_id), sys.stderr)
 
                 # cost expected, training over
                 if float(cost) < 0.01:
                     pass_avg_cost = cost_sum / cost_counter if cost_counter > 0 else 0.0
-                    print >> sys.stderr, "%d pass end, cost time: %02f, avg_cost: %f" % (
-                        pass_id, time.time() - pass_start_time, pass_avg_cost)
+                    print("%d pass end, cost time: %02f, avg_cost: %f" % (
+                        pass_id, time.time() - pass_start_time, pass_avg_cost), sys.stderr)
                     save_path = os.path.join(save_dirname, 'final')
-                    fluid.io.save_inference_model(save_path, ['word_data', 'token_pos'],
+                    fluid.io.save_inference_model(save_path, ['char_data', 'word_data', 'token_pos'],
                                                   [feature_out], exe, params_filename='params')
                     return
                 batch_id = batch_id + 1
@@ -106,13 +104,13 @@ def train(conf_dict, data_reader, use_cuda=False):
                 pass_id, time.time() - pass_start_time, pass_avg_cost)
             save_path = os.path.join(save_dirname, 'pass_%04d-%f' %
                                     (pass_id, pass_avg_cost))
-            fluid.io.save_inference_model(save_path, ['word_data', 'token_pos'],
+            fluid.io.save_inference_model(save_path, ['char_data', 'word_data', 'token_pos'],
                                           [feature_out], exe, params_filename='params')
 
         else:
             # pass times complete and the training is over
             save_path = os.path.join(save_dirname, 'final')
-            fluid.io.save_inference_model(save_path, ['word_data', 'token_pos'],
+            fluid.io.save_inference_model(save_path, ['char_data', 'word_data', 'token_pos'],
                                           [feature_out], exe, params_filename='params')
         return
 
@@ -122,9 +120,10 @@ def train(conf_dict, data_reader, use_cuda=False):
 def main(conf_dict, use_cuda=False):
     """Train main function"""
     if use_cuda and not fluid.core.is_compiled_with_cuda():
-        print >> sys.stderr, 'No GPU'
+        print('No GPU', sys.stderr)
         return
     data_generator = p_data_reader.RcDataReader(
+        charemb_dict_path=conf_dict['char_idx_path'],
         wordemb_dict_path=conf_dict['word_idx_path'],
         postag_dict_path=conf_dict['postag_dict_path'],
         label_dict_path=conf_dict['label_dict_path'],

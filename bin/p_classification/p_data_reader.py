@@ -133,7 +133,6 @@ class RcDataReader(object):
     def path_reader(self, data_path, need_input=False, need_label=True):
         """Read data from data_path"""
         self._feature_dict['data_keylist'] = []
-        print("进入pathreader")
         def reader():
             """Generator"""
             if os.path.isdir(data_path):

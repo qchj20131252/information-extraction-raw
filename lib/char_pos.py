@@ -1,10 +1,7 @@
 from tqdm import *
 import json
 
-train_data_path = '../data/train_data.json'
 train_data_hanlp_path = '../data/train_data_hanlp.json'
-train_data_char_path = '../data/train_data_char.json'
-dev_data_path = '../data/dev_data.json'
 dev_data_hanlp_path = '../data/dev_data_hanlp.json'
 
 
