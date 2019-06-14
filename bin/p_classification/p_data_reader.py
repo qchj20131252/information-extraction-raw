@@ -120,6 +120,7 @@ class RcDataReader(object):
         if len(sentence_emb_slot) == 0 or len(sentence_pos_slot) == 0 or len(sentence_char_list) == 0 \
                 or len(label_slot) == 0:
             return None
+        # feature_slot = [sentence_emb_slot, sentence_pos_slot]
         feature_slot = [sentence_char_slot, sentence_emb_slot, sentence_pos_slot]
 
         input_fields = json.dumps(dic, ensure_ascii=False)

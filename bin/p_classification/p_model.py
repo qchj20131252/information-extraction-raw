@@ -52,7 +52,6 @@ def db_lstm(data_reader, char, word, postag, conf_dict):
         is_distributed=emb_distributed,
         is_sparse=conf_dict['is_sparse'],
         param_attr=char_param)
-
     word_embedding = fluid.layers.embedding(
         input=word,
         size=[data_reader.get_dict_size('wordemb_dict'),
@@ -72,6 +71,7 @@ def db_lstm(data_reader, char, word, postag, conf_dict):
         param_attr=pos_param)
 
     # embedding
+    # emb_layers = [word_embedding, postag_embedding]
     emb_layers = [char_embedding, word_embedding, postag_embedding]
 
     # input hidden
@@ -80,7 +80,8 @@ def db_lstm(data_reader, char, word, postag, conf_dict):
         for emb in emb_layers
     ]
 
-    hidden_0 = fluid.layers.sums(input=hidden_0_layers)
+    # hidden_0 = fluid.layers.sums(input=hidden_0_layers)
+    hidden_0 = fluid.layers.concat(input=hidden_0_layers)
 
     lstm_0 = fluid.layers.dynamic_lstm(
         input=hidden_0,

@@ -51,6 +51,7 @@ def train(conf_dict, data_reader, use_cuda=False):
     target = fluid.layers.data(
         name='target', shape=[label_dict_len], dtype='float32', lod_level=0)
     # NN: embedding + lstm + pooling
+    # feature_out = p_model.db_lstm(data_reader, word, postag, conf_dict)
     feature_out = p_model.db_lstm(data_reader, char, word, postag, conf_dict)
     # loss function for multi-label classification
     class_cost = fluid.layers.sigmoid_cross_entropy_with_logits(x=feature_out, label=target)
@@ -65,6 +66,7 @@ def train(conf_dict, data_reader, use_cuda=False):
         batch_size=conf_dict['batch_size'])
 
     place = fluid.CUDAPlace(0) if use_cuda else fluid.CPUPlace()
+    # feeder = fluid.DataFeeder(feed_list=[word, postag, target], place=place)
     feeder = fluid.DataFeeder(feed_list=[char, word, postag, target], place=place)
     exe = fluid.Executor(place)
 
@@ -85,7 +87,7 @@ def train(conf_dict, data_reader, use_cuda=False):
                 cost_sum += cost
                 cost_counter += 1
                 if batch_id % 10 == 0 and batch_id != 0:
-                    print("batch %d finished, second per batch: %02f" % (batch_id, (time.time() - start_time) / batch_id), sys.stderr)
+                    print("batch %d finished, second per batch: %02f" % (batch_id, (time.time() - start_time) / batch_id))
 
                 # cost expected, training over
                 if float(cost) < 0.01:
@@ -100,8 +102,8 @@ def train(conf_dict, data_reader, use_cuda=False):
 
             # save the model once each pass ends 
             pass_avg_cost = cost_sum / cost_counter if cost_counter > 0 else 0.0
-            print >> sys.stderr, "%d pass end, cost time: %02f, avg_cost: %f" % (
-                pass_id, time.time() - pass_start_time, pass_avg_cost)
+            print("%d pass end, cost time: %02f, avg_cost: %f" % (
+                pass_id, time.time() - pass_start_time, pass_avg_cost), sys.stderr)
             save_path = os.path.join(save_dirname, 'pass_%04d-%f' %
                                     (pass_id, pass_avg_cost))
             fluid.io.save_inference_model(save_path, ['char_data', 'word_data', 'token_pos'],
